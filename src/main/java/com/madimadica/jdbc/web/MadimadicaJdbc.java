@@ -1,6 +1,7 @@
 package com.madimadica.jdbc.web;
 
 import com.madimadica.jdbc.api.BatchUpdate;
+import com.madimadica.jdbc.api.FlattenedParameters;
 import com.madimadica.jdbc.api.RowUpdate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -36,6 +37,43 @@ public interface MadimadicaJdbc {
      * @return quoted identifier
      */
     String wrapIdentifier(String identifier);
+
+    /**
+     * Execute an SQL statement
+     * @param sql to execute
+     */
+    default void execute(String sql) {
+        getJdbcTemplate().execute(sql);
+    }
+
+    /**
+     * Execute an SQL update (mutation) with no parameters.
+     * @param sql update to run
+     */
+    default int update(String sql) {
+        return getJdbcTemplate().update(sql);
+    }
+
+    /**
+     * Execute an SQL update/mutation with parameters
+     * @param sql SQL query string
+     * @param args varargs parameters which are flattened according to {@link com.madimadica.jdbc.api.FlattenedParameters#of(String, Object...)}
+     * @return number of modified rows
+     */
+    default int update(String sql, Object... args) {
+        var flattened = FlattenedParameters.of(sql, args);
+        return getJdbcTemplate().update(flattened.sql(), flattened.toArray());
+    }
+
+    /**
+     * Execute an SQL update/mutation with named parameters
+     * @param sql SQL query string
+     * @param namedArgs map of named arguments
+     * @return number of modified rows
+     */
+    default int update(String sql, Map<String, ?> namedArgs) {
+        return getNamedJdbcTemplate().update(sql, namedArgs);
+    }
 
     /**
      * <p>

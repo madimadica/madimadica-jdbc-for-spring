@@ -11,10 +11,19 @@ import java.util.List;
  * @param sql parameterized SQL
  * @param parameters List of parameters
  */
-record FlattenedParameters(
+public record FlattenedParameters(
         String sql,
         List<Object> parameters
 ) {
+
+    /**
+     * Return the parameters as an <code>Object[]</code>
+     * @return an <code>Object[]</code> of parameters
+     */
+    public Object[] toArray() {
+        return parameters.toArray();
+    }
+
     /**
      * <p>
      *     Parse and flatten an arbitrary SQL clause with escaped parameters.
@@ -42,7 +51,7 @@ record FlattenedParameters(
      * @throws IllegalArgumentException if there are more varargs than parameters.
      * @return {@link FlattenedParameters} parsed data of potentially expanded parameter collections.
      */
-    static FlattenedParameters of(String sql, Object... params) {
+    public static FlattenedParameters of(String sql, Object... params) {
         List<Object> paramList = List.of(params);
         int paramIndex = 0;
         List<Object> flattenedParams = new ArrayList<>();
