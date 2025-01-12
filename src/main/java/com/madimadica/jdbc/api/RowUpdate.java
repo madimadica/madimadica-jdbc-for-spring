@@ -58,7 +58,7 @@ public record RowUpdate(
      */
     public List<Object> getParams() {
         List<Object> params = new ArrayList<>(this.escapedUpdates.values());
-        params.add(whereParams);
+        params.addAll(whereParams);
         return params;
     }
 
