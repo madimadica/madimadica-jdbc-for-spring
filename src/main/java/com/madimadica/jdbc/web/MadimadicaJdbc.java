@@ -406,6 +406,18 @@ public interface MadimadicaJdbc {
     }
 
     /**
+     * Begin a sequence of fluent API operations to define a
+     * batch of UPDATE queries, terminated (and executed) by a WHERE operation.
+     * One query is performed for every row in the update (rows)
+     * @param tableName Name of the table to update
+     * @param rows row data to map to a single update
+     * @return fluent API builder to finish defining the update.
+     */
+    default <T> BatchUpdateBuilderSteps.First<T> batchUpdate(String tableName, List<T> rows) {
+        return new BatchUpdateBuilder<>(this, tableName, rows);
+    }
+
+    /**
      * <p>
      *     Perform a batch of update queries based on the given parameter object.
      * </p>

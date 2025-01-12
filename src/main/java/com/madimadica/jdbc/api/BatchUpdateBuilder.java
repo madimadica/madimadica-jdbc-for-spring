@@ -1,5 +1,7 @@
 package com.madimadica.jdbc.api;
 
+import com.madimadica.jdbc.web.MadimadicaJdbc;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import java.util.function.Function;
  */
 public class BatchUpdateBuilder<T> implements BatchUpdateBuilderSteps.Last<T> {
 
+    private final MadimadicaJdbc jdbcImpl;
     private final String tableName;
     private final List<T> rows;
     private final Map<String, Function<? super T, Object>> escapedMappings = new LinkedHashMap<>();
@@ -19,10 +22,12 @@ public class BatchUpdateBuilder<T> implements BatchUpdateBuilderSteps.Last<T> {
 
     /**
      * Public entry point
+     * @param jdbcImpl Implementation to use on terminal builder operation
      * @param tableName name of the table to update
      * @param rows rows reference to use for generating updates
      */
-    public BatchUpdateBuilder(String tableName, List<T> rows) {
+    public BatchUpdateBuilder(MadimadicaJdbc jdbcImpl, String tableName, List<T> rows) {
+        this.jdbcImpl = jdbcImpl;
         this.tableName = tableName;
         this.rows = rows;
     }
@@ -46,8 +51,8 @@ public class BatchUpdateBuilder<T> implements BatchUpdateBuilderSteps.Last<T> {
     }
 
     @Override
-    public BatchUpdate<T> where(String whereClause, List<Function<? super T, Object>> whereMappers) {
-        return new BatchUpdate<>(
+    public int[] where(String whereClause, List<Function<? super T, Object>> whereMappers) {
+        BatchUpdate<T> batchUpdate = new BatchUpdate<>(
                 tableName,
                 rows,
                 escapedMappings,
@@ -56,5 +61,6 @@ public class BatchUpdateBuilder<T> implements BatchUpdateBuilderSteps.Last<T> {
                 whereClause,
                 whereMappers
         );
+        return jdbcImpl.update(batchUpdate);
     }
 }

@@ -1,6 +1,5 @@
 package com.madimadica.jdbc.api;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -9,28 +8,8 @@ import java.util.function.Function;
 /**
  * <p>Represents the state to perform a batch of updates to a single table</p>
  * <p>
- *     Can be constructed directly, or more likely constructed through the fluent API. For example:
- * </p>
- * <pre>
- * BatchUpdate.of("users", userList)
- *         .set("first_name", User::firstName)
- *         .set("last_name", User::lastName)
- *         .setUnescaped("updated_at", "GETDATE()")
- *         .set("updated_by", actor)
- *         .where("id = ?", User::getId)
- * </pre>
- * <p>The previous snippet creates the following SQL template per row (with some dialect variations):</p>
- * <pre>
- * UPDATE users
- * SET first_name = ?,
- *     last_name = ?,
- *     updated_at = GETDATE(),
- *     updated_by = ?
- * WHERE id = ?
- * </pre>
- * <p>
- *     If by some chance you need to have an escaped constant in the WHERE clause parameters,
- *     use a lambda such as <code>(ignored) -> myConstant</code> for the function.
+ *     If you need an escaped constant in the WHERE clause parameters,
+ *     use a lambda such as <code>ignored -> myConstant</code> for the function.
  * </p>
  * @param tableName name of the table to update
  * @param rows objects to map row updates for
@@ -71,17 +50,6 @@ public record BatchUpdate<T> (
         if (escapedMappings.isEmpty() && escapedConstants.isEmpty() && unescapedConstants.isEmpty()) {
             throw new IllegalArgumentException("Must update at least one column");
         }
-    }
-
-    /**
-     * Static factory to create a fluent builder
-     * @param tableName name of the table to update
-     * @param rows rows to map updates on
-     * @return fluent builder
-     * @param <T> type of the rows to map
-     */
-    public static <T> BatchUpdateBuilderSteps.First<T> of(String tableName, List<T> rows) {
-        return new BatchUpdateBuilder<>(tableName, rows);
     }
 
     /**

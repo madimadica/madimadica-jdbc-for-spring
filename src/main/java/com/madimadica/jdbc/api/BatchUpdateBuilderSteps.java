@@ -52,79 +52,82 @@ public class BatchUpdateBuilderSteps {
 
     /**
      * Represents the last step in configuring a batch update,
-     * which can involve setting additional column mapping, and
-     * is terminated by assigning a WHERE clause.
+     * which can involve setting additional column mappings, and
+     * is terminated by assigning a WHERE clause. The terminal
+     * operation executes an UPDATE statement when invoked.
      * @see BatchUpdateBuilderSteps.Last
      * @see BatchUpdate
      * @param <T> type of row elements
      */
     public interface Last<T> extends First<T> {
         /**
-         * Set a WHERE clause with functional mappings to escaped parameters
+         * Set a WHERE clause with functional mappings to escaped parameters.
+         * Performs terminal UPDATE query operation.
          * @param whereClause where clause template
-         * @param whereMappers functions to map <code>T</code> to parameter
-         * @return a built BatchUpdate parameter object
+         * @param whereMappers functions to map <code>T</code> to parameters
+         * @return number of rows affected per query
          */
-        BatchUpdate<T> where(String whereClause, List<Function<? super T, Object>> whereMappers);
+        int[] where(String whereClause, List<Function<? super T, Object>> whereMappers);
 
         /**
          * Set a WHERE clause to an <code>id</code> column check, mapped by the given ID function.
+         * Performs terminal UPDATE query operation.
          * <p>
          *      <code>whereIdEquals(Foo::bar)</code> is equivalent to invoking <code>where("id = ?", Foo::bar)</code>
          * </p>
          * @param idMapper functions to map <code>T</code> to the ID
          * @see Last#where(String, List)
-         * @return a built BatchUpdate parameter object
+         * @return number of rows affected per query
          */
-        default BatchUpdate<T> whereIdEquals(Function<? super T, Object> idMapper) {
+        default int[] whereIdEquals(Function<? super T, Object> idMapper) {
             return where("id = ?", idMapper);
         }
 
         /**
          * <p>
-         *     An overloaded method to assign a WHERE clause mapping
+         *     An overloaded method to assign a WHERE clause mapping and execute an UPDATE
          * </p>
          * @param whereClause where clause template
          * @param whereMapper function to map <code>T</code> to the first parameter
          * @see Last#where(String, List)
-         * @return a built BatchUpdate parameter object
+         * @return number of rows affected per query
          */
-        default BatchUpdate<T> where(String whereClause, Function<? super T, Object> whereMapper) {
+        default int[] where(String whereClause, Function<? super T, Object> whereMapper) {
             return where(whereClause, List.of(whereMapper));
         }
 
         /**
          * <p>
-         *     An overloaded method to assign a WHERE clause mapping
+         *     An overloaded method to assign a WHERE clause mapping and execute an UPDATE
          * </p>
          * @param whereClause where clause template
          * @param whereMapper1 function to map <code>T</code> to the first parameter
          * @param whereMapper2 function to map <code>T</code> to the second parameter
          * @see Last#where(String, List)
-         * @return a built BatchUpdate parameter object
+         * @return number of rows affected per query
          */
-        default BatchUpdate<T> where(String whereClause, Function<? super T, Object> whereMapper1, Function<? super T, Object> whereMapper2) {
+        default int[] where(String whereClause, Function<? super T, Object> whereMapper1, Function<? super T, Object> whereMapper2) {
             return where(whereClause, List.of(whereMapper1, whereMapper2));
         }
 
         /**
          * <p>
-         *     An overloaded method to assign a WHERE clause mapping
+         *     An overloaded method to assign a WHERE clause mapping and execute an UPDATE
          * </p>
          * @param whereClause where clause template
          * @param whereMapper1 function to map <code>T</code> to the first parameter
          * @param whereMapper2 function to map <code>T</code> to the second parameter
          * @param whereMapper3 function to map <code>T</code> to the third parameter
          * @see Last#where(String, List)
-         * @return a built BatchUpdate parameter object
+         * @return number of rows affected per query
          */
-        default BatchUpdate<T> where(String whereClause, Function<? super T, Object> whereMapper1, Function<? super T, Object> whereMapper2, Function<? super T, Object> whereMapper3) {
+        default int[] where(String whereClause, Function<? super T, Object> whereMapper1, Function<? super T, Object> whereMapper2, Function<? super T, Object> whereMapper3) {
             return where(whereClause, List.of(whereMapper1, whereMapper2, whereMapper3));
         }
 
         /**
          * <p>
-         *     An overloaded method to assign a WHERE clause mapping
+         *     An overloaded method to assign a WHERE clause mapping and execute an UPDATE
          * </p>
          * @param whereClause where clause template
          * @param whereMapper1 function to map <code>T</code> to the first parameter
@@ -132,9 +135,9 @@ public class BatchUpdateBuilderSteps {
          * @param whereMapper3 function to map <code>T</code> to the third parameter
          * @param whereMapper4 function to map <code>T</code> to the fourth parameter
          * @see Last#where(String, List)
-         * @return a built BatchUpdate parameter object
+         * @return number of rows affected per query
          */
-        default BatchUpdate<T> where(String whereClause, Function<? super T, Object> whereMapper1, Function<? super T, Object> whereMapper2, Function<? super T, Object> whereMapper3, Function<? super T, Object> whereMapper4) {
+        default int[] where(String whereClause, Function<? super T, Object> whereMapper1, Function<? super T, Object> whereMapper2, Function<? super T, Object> whereMapper3, Function<? super T, Object> whereMapper4) {
             return where(whereClause, List.of(whereMapper1, whereMapper2, whereMapper3, whereMapper4));
         }
     }
