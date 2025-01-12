@@ -5,10 +5,7 @@ import com.madimadica.jdbc.api.RowUpdate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -66,7 +63,8 @@ public interface MadimadicaJdbc {
         sql.append(" WHERE ");
         sql.append(rowUpdate.whereClause());
 
-        getJdbcTemplate().update(sql.toString(), rowUpdate.getParams().toArray());
+        Object[] params = rowUpdate.getParams().toArray();
+        getJdbcTemplate().update(sql.toString(), params);
     }
 
     /**
