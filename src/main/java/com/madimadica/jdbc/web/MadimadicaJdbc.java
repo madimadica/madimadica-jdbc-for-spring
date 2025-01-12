@@ -1,8 +1,6 @@
 package com.madimadica.jdbc.web;
 
-import com.madimadica.jdbc.api.BatchUpdate;
-import com.madimadica.jdbc.api.FlattenedParameters;
-import com.madimadica.jdbc.api.RowUpdate;
+import com.madimadica.jdbc.api.*;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -364,6 +362,16 @@ public interface MadimadicaJdbc {
      */
     default Optional<String> queryString(String sql, Map<String, ?> namedArgs) {
         return queryOneHelper(queryStrings(sql, namedArgs));
+    }
+
+    /**
+     * Begin a sequence of fluent API operations to define a
+     * table UPDATE query, terminated (and executed) by a WHERE operation.
+     * @param tableName Name of the table to update
+     * @return fluent API builder to finish defining the update.
+     */
+    default RowUpdateBuilderSteps.First updateTable(String tableName) {
+        return new RowUpdateBuilder(this, tableName);
     }
 
     /**

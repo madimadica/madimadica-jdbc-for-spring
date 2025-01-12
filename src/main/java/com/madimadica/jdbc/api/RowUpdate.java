@@ -62,14 +62,4 @@ public record RowUpdate(
         return params;
     }
 
-
-    /**
-     * Static factory to create a fluent builder
-     * @param tableName name of the table to update
-     * @return fluent builder instance
-     * @see RowUpdateBuilderSteps
-     */
-    public static RowUpdateBuilderSteps.First of(String tableName) {
-        return new RowUpdateBuilder(tableName);
-    }
 }

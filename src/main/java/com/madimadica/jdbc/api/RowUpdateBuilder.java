@@ -1,20 +1,25 @@
 package com.madimadica.jdbc.api;
 
+import com.madimadica.jdbc.web.MadimadicaJdbc;
+
 import java.util.*;
 
 /**
  * Fluent builder implementation for {@link RowUpdate}.
  */
 public class RowUpdateBuilder implements RowUpdateBuilderSteps.Last {
+    private final MadimadicaJdbc jdbcImpl;
     private final String tableName;
     private final Map<String, Object> escapedUpdates = new LinkedHashMap<>();
     private final Map<String, Object> uncapedUpdates = new LinkedHashMap<>();
 
     /**
      * Public entry point
+     * @param jdbcImpl Implementation to use on terminal builder operation
      * @param tableName name of the table to update
      */
-    public RowUpdateBuilder(String tableName) {
+    public RowUpdateBuilder(MadimadicaJdbc jdbcImpl, String tableName) {
+        this.jdbcImpl = jdbcImpl;
         this.tableName = tableName;
     }
 
@@ -43,14 +48,15 @@ public class RowUpdateBuilder implements RowUpdateBuilderSteps.Last {
     }
 
     @Override
-    public RowUpdate where(String whereClause, Object... whereParams) {
+    public int where(String whereClause, Object... whereParams) {
         var whereData = FlattenedParameters.of(whereClause, whereParams);
-        return new RowUpdate(
+        RowUpdate update = new RowUpdate(
                 this.tableName,
                 this.escapedUpdates,
                 this.uncapedUpdates,
                 whereData.sql(),
                 whereData.parameters()
         );
+        return jdbcImpl.update(update);
     }
 }
