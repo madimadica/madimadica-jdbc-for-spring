@@ -123,13 +123,7 @@ public interface MadimadicaJdbc {
      * @param <T> type of the Optional result
      */
     default <T> Optional<T> queryOne(String sql, RowMapper<T> rowMapper) {
-        var results = query(sql, rowMapper);
-        int size = results.size();
-        return switch (size) {
-            case 0 -> Optional.empty();
-            case 1 -> Optional.of(results.getFirst());
-            default -> throw new IncorrectResultSizeDataAccessException(1, size);
-        };
+        return queryOneHelper(query(sql, rowMapper));
     }
 
     /**
@@ -143,13 +137,7 @@ public interface MadimadicaJdbc {
      * @param <T> type of the Optional result
      */
     default <T> Optional<T> queryOne(String sql, RowMapper<T> rowMapper, Object... args) {
-        var results = query(sql, rowMapper, args);
-        int size = results.size();
-        return switch (size) {
-            case 0 -> Optional.empty();
-            case 1 -> Optional.of(results.getFirst());
-            default -> throw new IncorrectResultSizeDataAccessException(1, size);
-        };
+        return queryOneHelper(query(sql, rowMapper, args));
     }
 
     /**
@@ -163,7 +151,18 @@ public interface MadimadicaJdbc {
      * @param <T> type of the Optional result
      */
     default <T> Optional<T> queryOne(String sql, RowMapper<T> rowMapper, Map<String, ?> namedArgs) {
-        var results = query(sql, rowMapper, namedArgs);
+        return queryOneHelper(query(sql, rowMapper, namedArgs));
+    }
+
+    /**
+     * Convert a list of results into an optional value. If there are no results, an empty optional is returned.
+     * If there are multiple results, an exception is thrown.
+     * @param results list of row results
+     * @return an optionally mapped row.
+     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     * @param <T> type of the Optional result.
+     */
+    private static <T> Optional<T> queryOneHelper(List<T> results) {
         int size = results.size();
         return switch (size) {
             case 0 -> Optional.empty();
@@ -171,7 +170,7 @@ public interface MadimadicaJdbc {
             default -> throw new IncorrectResultSizeDataAccessException(1, size);
         };
     }
-
+    
     /**
      * <p>
      *     Perform a row update query based on the given parameter object.
