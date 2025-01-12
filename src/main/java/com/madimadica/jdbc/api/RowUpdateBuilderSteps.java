@@ -6,11 +6,11 @@ import java.util.Map;
 /**
  * Namespace container for the fluent builder steps used by {@link RowUpdateBuilder} to construct a {@link RowUpdate}.
  */
-public final class RowUpdatePhases {
+public final class RowUpdateBuilderSteps {
     /**
      * Restrict public access from constructing this namespace class
      */
-    private RowUpdatePhases() {}
+    private RowUpdateBuilderSteps() {}
 
     /**
      * Represents the first step in configuring a row update,
@@ -23,7 +23,7 @@ public final class RowUpdatePhases {
          * Set a column by name to an escaped value
          * @param column column name
          * @param value value to escape
-         * @return {@link Last} phase builder
+         * @return {@link Last} step builder
          */
         Last set(String column, Object value);
 
@@ -31,7 +31,7 @@ public final class RowUpdatePhases {
          * Set multiple mappings from column names to values.
          * The map entry keys are the column names, and the entry values are the value to assign, as an escaped value.
          * @param changes Map of column name-value mappings
-         * @return {@link Last} phase builder
+         * @return {@link Last} step builder
          */
         Last set(Map<String, Object> changes);
 
@@ -44,7 +44,7 @@ public final class RowUpdatePhases {
          *
          * @param column column name
          * @param value value to escape
-         * @return {@link Last} phase builder
+         * @return {@link Last} step builder
          */
         Last setUnescaped(String column, Object value);
 
@@ -56,7 +56,7 @@ public final class RowUpdatePhases {
          * This should only be used with literal values like "GETDATE()"
          * or constants in code. Do not use this method with anything user-controlled.
          * @param changes Map of column name-value mappings
-         * @return {@link Last} phase builder
+         * @return {@link Last} step builder
          */
         Last setUnescaped(Map<String, Object> changes);
     }

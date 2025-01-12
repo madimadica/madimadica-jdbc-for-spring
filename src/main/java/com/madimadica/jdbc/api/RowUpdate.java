@@ -67,9 +67,9 @@ public record RowUpdate(
      * Static factory to create a fluent builder
      * @param tableName name of the table to update
      * @return fluent builder instance
-     * @see RowUpdatePhases
+     * @see RowUpdateBuilderSteps
      */
-    public static RowUpdatePhases.First of(String tableName) {
+    public static RowUpdateBuilderSteps.First of(String tableName) {
         return new RowUpdateBuilder(tableName);
     }
 }

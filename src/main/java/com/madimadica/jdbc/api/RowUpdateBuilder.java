@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Fluent builder implementation for {@link RowUpdate}.
  */
-public class RowUpdateBuilder implements RowUpdatePhases.Last {
+public class RowUpdateBuilder implements RowUpdateBuilderSteps.Last {
     private final String tableName;
     private final Map<String, Object> escapedUpdates = new LinkedHashMap<>();
     private final Map<String, Object> uncapedUpdates = new LinkedHashMap<>();
@@ -19,25 +19,25 @@ public class RowUpdateBuilder implements RowUpdatePhases.Last {
     }
 
     @Override
-    public RowUpdatePhases.Last set(String column, Object value) {
+    public RowUpdateBuilderSteps.Last set(String column, Object value) {
         this.escapedUpdates.put(column, value);
         return this;
     }
 
     @Override
-    public RowUpdatePhases.Last set(Map<String, Object> changes) {
+    public RowUpdateBuilderSteps.Last set(Map<String, Object> changes) {
         this.escapedUpdates.putAll(changes);
         return this;
     }
 
     @Override
-    public RowUpdatePhases.Last setUnescaped(String column, Object value) {
+    public RowUpdateBuilderSteps.Last setUnescaped(String column, Object value) {
         this.uncapedUpdates.put(column, value);
         return this;
     }
 
     @Override
-    public RowUpdatePhases.Last setUnescaped(Map<String, Object> changes) {
+    public RowUpdateBuilderSteps.Last setUnescaped(Map<String, Object> changes) {
         this.uncapedUpdates.putAll(changes);
         return this;
     }
