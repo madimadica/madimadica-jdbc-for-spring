@@ -44,12 +44,12 @@ public class RowUpdateBuilder implements RowUpdateBuilderSteps.Last {
 
     @Override
     public RowUpdate where(String whereClause, Object... whereParams) {
-        var whereData = ParameterizedWhere.of(whereClause, whereParams);
+        var whereData = FlattenedParameters.of(whereClause, whereParams);
         return new RowUpdate(
                 this.tableName,
                 this.escapedUpdates,
                 this.uncapedUpdates,
-                whereData.parameterizedClause(),
+                whereData.sql(),
                 whereData.parameters()
         );
     }
