@@ -84,8 +84,9 @@ public interface MadimadicaJdbc {
      * </p>
      * @see RowUpdate
      * @param rowUpdate {@link RowUpdate} parameter object
+     * @return number of modified rows
      */
-    default void update(RowUpdate rowUpdate) {
+    default int update(RowUpdate rowUpdate) {
         StringBuilder sql = new StringBuilder("UPDATE ");
         sql.append(wrapIdentifier(rowUpdate.tableName()));
         sql.append(" SET ");
@@ -102,7 +103,7 @@ public interface MadimadicaJdbc {
         sql.append(rowUpdate.whereClause());
 
         Object[] params = rowUpdate.getParams().toArray();
-        getJdbcTemplate().update(sql.toString(), params);
+        return getJdbcTemplate().update(sql.toString(), params);
     }
 
     /**
@@ -116,9 +117,9 @@ public interface MadimadicaJdbc {
      * @param batchUpdate {@link BatchUpdate} parameter object
      * @param <T> type of row elements
      */
-    default <T> void update(BatchUpdate<T> batchUpdate) {
+    default <T> int[] update(BatchUpdate<T> batchUpdate) {
         if (batchUpdate.isEmpty()) {
-            return;
+            return new int[] {};
         }
         StringBuilder sql = new StringBuilder("UPDATE ");
         sql.append(wrapIdentifier(batchUpdate.tableName()));
@@ -157,7 +158,7 @@ public interface MadimadicaJdbc {
             }
             allParams.add(args);
         }
-        getJdbcTemplate().batchUpdate(sql.toString(), allParams);
+        return getJdbcTemplate().batchUpdate(sql.toString(), allParams);
     }
 
 }
