@@ -39,7 +39,7 @@ public record RowUpdate(
      * @param whereParams list of parameters to bind to the WHERE clause
      * @throws NullPointerException if any argument is <code>null</code>.
      */
-    public RowUpdate(String tableName, Map<String, Object> escapedUpdates, Map<String, Object> unescapedUpdates, String whereClause, List<Object> whereParams) {
+    public RowUpdate {
         Objects.requireNonNull(tableName);
         Objects.requireNonNull(escapedUpdates);
         Objects.requireNonNull(unescapedUpdates);
@@ -48,12 +48,6 @@ public record RowUpdate(
         if (escapedUpdates.isEmpty() && unescapedUpdates.isEmpty()) {
             throw new IllegalArgumentException("At least one column update must be provided");
         }
-
-        this.tableName = tableName;
-        this.escapedUpdates = Map.copyOf(escapedUpdates);
-        this.unescapedUpdates = Map.copyOf(unescapedUpdates);
-        this.whereClause = whereClause;
-        this.whereParams = List.copyOf(whereParams);
     }
 
 
