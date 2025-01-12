@@ -1,5 +1,6 @@
 package com.madimadica.jdbc.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,6 +51,16 @@ public record RowUpdate(
         }
     }
 
+    /**
+     * Get a list of the parameterized values, with the ordered updates appearing first,
+     * then the where clause parameters.
+     * @return ordered list of escaped parameters.
+     */
+    public List<Object> getParams() {
+        List<Object> params = new ArrayList<>(this.escapedUpdates.values());
+        params.add(whereParams);
+        return params;
+    }
 
 
     /**

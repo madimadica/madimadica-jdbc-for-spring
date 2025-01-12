@@ -53,10 +53,7 @@ public class SqlServerJdbc {
         sql.append(" WHERE ");
         sql.append(rowUpdate.whereClause());
 
-        List<Object> params = new ArrayList<>(rowUpdate.escapedUpdates().values());
-        params.addAll(rowUpdate.unescapedUpdates().values());
-
-        this.jdbc.update(sql.toString(), params.toArray());
+        this.jdbc.update(sql.toString(), rowUpdate.getParams().toArray());
     }
 
     /**
