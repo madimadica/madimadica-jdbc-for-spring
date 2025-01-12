@@ -7,15 +7,6 @@ import java.util.Objects;
 
 /**
  * <p>Represents the state to perform a table row update</p>
- * <p>
- *     Can be constructed directly, or more likely constructed through the fluent API. For example:
- * </p>
- * <pre>
- * RowUpdate.of("users")
- *         .set("first_name", dto.firstName())
- *         .set("last_name", dto.lastName())
- *         .whereIdEquals(dto.id())
- * </pre>
  *
  * @param tableName name of the table to update
  * @param escapedUpdates mapping of column names to escaped values
