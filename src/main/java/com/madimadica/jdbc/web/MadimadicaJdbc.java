@@ -3,6 +3,7 @@ package com.madimadica.jdbc.web;
 import com.madimadica.jdbc.api.BatchUpdate;
 import com.madimadica.jdbc.api.FlattenedParameters;
 import com.madimadica.jdbc.api.RowUpdate;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -110,6 +111,65 @@ public interface MadimadicaJdbc {
      */
     default <T> List<T> query(String sql, RowMapper<T> rowMapper, Map<String, ?> namedArgs) {
         return getNamedJdbcTemplate().query(sql, namedArgs, rowMapper);
+    }
+
+    /**
+     * Runs an SQL query without parameters and collects the result into an {@link Optional} value.
+     * The result is empty if no rows were returned, and present if 1 row was returned.
+     * @param sql SQL query
+     * @param rowMapper function to map the resulting row
+     * @return an optionally mapped row.
+     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     * @param <T> type of the Optional result
+     */
+    default <T> Optional<T> queryOne(String sql, RowMapper<T> rowMapper) {
+        var results = query(sql, rowMapper);
+        int size = results.size();
+        return switch (size) {
+            case 0 -> Optional.empty();
+            case 1 -> Optional.of(results.getFirst());
+            default -> throw new IncorrectResultSizeDataAccessException(1, size);
+        };
+    }
+
+    /**
+     * Runs an SQL query with flattened parameters and collects the result into an {@link Optional} value.
+     * The result is empty if no rows were returned, and present if 1 row was returned.
+     * @param sql SQL query
+     * @param rowMapper function to map the resulting row
+     * @param args varargs parameters, which are flattened according to {@link FlattenedParameters#of(String, Object...)}
+     * @return an optionally mapped row.
+     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     * @param <T> type of the Optional result
+     */
+    default <T> Optional<T> queryOne(String sql, RowMapper<T> rowMapper, Object... args) {
+        var results = query(sql, rowMapper, args);
+        int size = results.size();
+        return switch (size) {
+            case 0 -> Optional.empty();
+            case 1 -> Optional.of(results.getFirst());
+            default -> throw new IncorrectResultSizeDataAccessException(1, size);
+        };
+    }
+
+    /**
+     * Runs an SQL query with named parameters and collects the result into an {@link Optional} value.
+     * The result is empty if no rows were returned, and present if 1 row was returned.
+     * @param sql SQL query
+     * @param rowMapper function to map the resulting row
+     * @param namedArgs map of named parameters
+     * @return an optionally mapped row.
+     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     * @param <T> type of the Optional result
+     */
+    default <T> Optional<T> queryOne(String sql, RowMapper<T> rowMapper, Map<String, ?> namedArgs) {
+        var results = query(sql, rowMapper, namedArgs);
+        int size = results.size();
+        return switch (size) {
+            case 0 -> Optional.empty();
+            case 1 -> Optional.of(results.getFirst());
+            default -> throw new IncorrectResultSizeDataAccessException(1, size);
+        };
     }
 
     /**
