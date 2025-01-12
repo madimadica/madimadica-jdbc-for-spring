@@ -202,6 +202,36 @@ public interface MadimadicaJdbc {
     }
 
     /**
+     * Query a list of 32-bit ints
+     * @param sql SQL query
+     * @return a list of integers
+     */
+    default List<Integer> queryInts(String sql) {
+        return getJdbcTemplate().queryForList(sql, Integer.class);
+    }
+
+    /**
+     * Query a list of 32-bit ints, with flattened parameters.
+     * @param sql SQL query
+     * @param args varargs parameters, which are flattened according to {@link FlattenedParameters#of(String, Object...)}
+     * @return a list of integers
+     */
+    default List<Integer> queryInts(String sql, Object... args) {
+        var flattened = FlattenedParameters.of(sql, args);
+        return getJdbcTemplate().queryForList(flattened.sql(), Integer.class, flattened.toArray());
+    }
+
+    /**
+     * Query a list of 32-bit ints, with named parameters.
+     * @param sql SQL query
+     * @param namedArgs map of named parameters
+     * @return a list of integers
+     */
+    default List<Integer> queryInts(String sql, Map<String, ?> namedArgs) {
+        return getNamedJdbcTemplate().queryForList(sql, namedArgs, Integer.class);
+    }
+
+    /**
      * <p>
      *     Perform a row update query based on the given parameter object.
      * </p>
