@@ -5,13 +5,13 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Root configuration source of the library.
- * Include via <code>@Import(MadimadicaJdbc.class)</code>
+ * Include via <code>@Import(InitializeJdbc.class)</code>
  */
 @Configuration
 @ComponentScan("com.madimadica.jdbc.web")
-public class MadimadicaJdbc {
+public class InitializeJdbc {
     /**
-     * Prevent user instantiation
+     * Visible constructor for Spring initialization
      */
-    private MadimadicaJdbc() {}
+    public InitializeJdbc() {}
 }
