@@ -4,6 +4,7 @@ import com.madimadica.jdbc.api.BatchUpdate;
 import com.madimadica.jdbc.api.FlattenedParameters;
 import com.madimadica.jdbc.api.RowUpdate;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.util.*;
@@ -57,7 +58,7 @@ public interface MadimadicaJdbc {
     /**
      * Execute an SQL update/mutation with parameters
      * @param sql SQL query string
-     * @param args varargs parameters which are flattened according to {@link com.madimadica.jdbc.api.FlattenedParameters#of(String, Object...)}
+     * @param args varargs parameters, which are flattened according to {@link FlattenedParameters#of(String, Object...)}
      * @return number of modified rows
      */
     default int update(String sql, Object... args) {
@@ -73,6 +74,42 @@ public interface MadimadicaJdbc {
      */
     default int update(String sql, Map<String, ?> namedArgs) {
         return getNamedJdbcTemplate().update(sql, namedArgs);
+    }
+
+    /**
+     * Run an SQL query and collect the rows into a list
+     * @param sql SQL query
+     * @param rowMapper function to map each resulting row
+     * @return the mapped result set
+     * @param <T> type of the result
+     */
+    default <T> List<T> query(String sql, RowMapper<T> rowMapper) {
+        return getJdbcTemplate().query(sql, rowMapper);
+    }
+
+    /**
+     * Run an SQL query with flattened parameters and collect the rows into a list.
+     * @param sql SQL query
+     * @param rowMapper function to map each resulting row
+     * @param args varargs parameters, which are flattened according to {@link FlattenedParameters#of(String, Object...)}
+     * @return the mapped result set
+     * @param <T> type of the result
+     */
+    default <T> List<T> query(String sql, RowMapper<T> rowMapper, Object... args) {
+        var flattened = FlattenedParameters.of(sql, args);
+        return getJdbcTemplate().query(flattened.sql(), rowMapper, flattened.toArray());
+    }
+
+    /**
+     * Run an SQL query with named parameters and collect the rows into a list.
+     * @param sql SQL query
+     * @param rowMapper function to map each resulting row
+     * @param namedArgs map of named parameters
+     * @return the mapped result set
+     * @param <T> type of the result
+     */
+    default <T> List<T> query(String sql, RowMapper<T> rowMapper, Map<String, ?> namedArgs) {
+        return getNamedJdbcTemplate().query(sql, namedArgs, rowMapper);
     }
 
     /**
