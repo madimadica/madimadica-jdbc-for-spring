@@ -170,7 +170,37 @@ public interface MadimadicaJdbc {
             default -> throw new IncorrectResultSizeDataAccessException(1, size);
         };
     }
-    
+
+    /**
+     * Query a list of 64-bit longs
+     * @param sql SQL query
+     * @return a list of longs
+     */
+    default List<Long> queryLongs(String sql) {
+        return getJdbcTemplate().queryForList(sql, Long.class);
+    }
+
+    /**
+     * Query a list of 64-bit longs, with flattened parameters.
+     * @param sql SQL query
+     * @param args varargs parameters, which are flattened according to {@link FlattenedParameters#of(String, Object...)}
+     * @return a list of longs
+     */
+    default List<Long> queryLongs(String sql, Object... args) {
+        var flattened = FlattenedParameters.of(sql, args);
+        return getJdbcTemplate().queryForList(flattened.sql(), Long.class, flattened.toArray());
+    }
+
+    /**
+     * Query a list of 64-bit longs, with named parameters.
+     * @param sql SQL query
+     * @param namedArgs map of named parameters
+     * @return a list of longs
+     */
+    default List<Long> queryLongs(String sql, Map<String, ?> namedArgs) {
+        return getNamedJdbcTemplate().queryForList(sql, namedArgs, Long.class);
+    }
+
     /**
      * <p>
      *     Perform a row update query based on the given parameter object.
