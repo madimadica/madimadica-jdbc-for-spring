@@ -232,6 +232,36 @@ public interface MadimadicaJdbc {
     }
 
     /**
+     * Query a list of strings
+     * @param sql SQL query
+     * @return a list of strings
+     */
+    default List<String> queryStrings(String sql) {
+        return getJdbcTemplate().queryForList(sql, String.class);
+    }
+
+    /**
+     * Query a list of strings, with flattened parameters.
+     * @param sql SQL query
+     * @param args varargs parameters, which are flattened according to {@link FlattenedParameters#of(String, Object...)}
+     * @return a list of integers
+     */
+    default List<String> queryStrings(String sql, Object... args) {
+        var flattened = FlattenedParameters.of(sql, args);
+        return getJdbcTemplate().queryForList(flattened.sql(), String.class, flattened.toArray());
+    }
+
+    /**
+     * Query a list of strings, with named parameters.
+     * @param sql SQL query
+     * @param namedArgs map of named parameters
+     * @return a list of strings
+     */
+    default List<String> queryStrings(String sql, Map<String, ?> namedArgs) {
+        return getNamedJdbcTemplate().queryForList(sql, namedArgs, String.class);
+    }
+
+    /**
      * <p>
      *     Perform a row update query based on the given parameter object.
      * </p>
