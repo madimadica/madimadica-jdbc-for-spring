@@ -297,6 +297,41 @@ public interface MadimadicaJdbc {
     }
 
     /**
+     * Run a query with no parameters for an {@link Optional} {@link Integer}.
+     * The result is empty if no rows were returned, and present if 1 row was returned.
+     * @param sql SQL query
+     * @return an optionally mapped row.
+     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     */
+    default Optional<Integer> queryInt(String sql) {
+        return queryOneHelper(queryInts(sql));
+    }
+
+    /**
+     * Run a query with varargs parameters for an {@link Optional} {@link Integer}.
+     * The result is empty if no rows were returned, and present if 1 row was returned.
+     * @param sql SQL query
+     * @param args varargs parameters, which are flattened according to {@link FlattenedParameters#of(String, Object...)}
+     * @return an optionally mapped row.
+     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     */
+    default Optional<Integer> queryInt(String sql, Object... args) {
+        return queryOneHelper(queryInts(sql, args));
+    }
+
+    /**
+     * Run a query with named parameters for an {@link Optional} {@link Integer}.
+     * The result is empty if no rows were returned, and present if 1 row was returned.
+     * @param sql SQL query
+     * @param namedArgs map of named parameters
+     * @return an optionally mapped row.
+     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     */
+    default Optional<Integer> queryInt(String sql, Map<String, ?> namedArgs) {
+        return queryOneHelper(queryInts(sql, namedArgs));
+    }
+
+    /**
      * <p>
      *     Perform a row update query based on the given parameter object.
      * </p>
