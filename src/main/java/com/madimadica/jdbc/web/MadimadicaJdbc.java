@@ -1,15 +1,17 @@
 package com.madimadica.jdbc.web;
 
 import com.madimadica.jdbc.api.*;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.function.Function;
@@ -549,6 +551,135 @@ public interface MadimadicaJdbc {
             return ps;
         }, keyHolder);
         return keyHolder.getKey();
+    }
+
+    /**
+     * Begin a sequence of fluent API operations to define a batch of
+     * row INSERT INTO queries. Terminated (and executed) by a call to insert,
+     * with or without a returning generated values.
+     * @param tableName Name of the table to update
+     * @param <T> type of rows to map
+     * @param rows list of rows to map to inserts
+     * @return fluent API builder to finish defining the insert.
+     */
+    default <T> BatchInsertBuilderSteps.AdditionalValues<T> batchInsertInto(String tableName, List<T> rows) {
+        return new BatchInsertBuilder<>(this, tableName, rows);
+    }
+
+    /**
+     * Helper method to generate an INSERT INTO statement from a {@link BatchInsert} object
+     * @param jdbcImpl implementation used by this database
+     * @param batchInsert batch insert data to generate off of
+     * @return SQL query string, with escaped parameters, if any
+     */
+    private static <T> String generateInsertSql(MadimadicaJdbc jdbcImpl, BatchInsert<T> batchInsert) {
+        StringJoiner columnNames = new StringJoiner(", ", "(", ")");
+        for (String col : batchInsert.escapedMappings().keySet()) {
+            columnNames.add(jdbcImpl.wrapIdentifier(col));
+        }
+        for (String col : batchInsert.escapedConstants().keySet()) {
+            columnNames.add(jdbcImpl.wrapIdentifier(col));
+        }
+        for (String col : batchInsert.unescapedConstants().keySet()) {
+            columnNames.add(jdbcImpl.wrapIdentifier(col));
+        }
+
+        StringJoiner values = new StringJoiner(", ", "(", ")");
+        for (int i = 0, LUB = batchInsert.escapedMappings().size() + batchInsert.escapedConstants().size(); i < LUB; ++i) {
+            values.add("?");
+        }
+        for (Object value : batchInsert.unescapedConstants().values()) {
+            values.add(String.valueOf(value));
+        }
+
+        return "INSERT INTO " +
+                jdbcImpl.wrapIdentifier(batchInsert.tableName()) +
+                columnNames +
+                " VALUES " +
+                values;
+    }
+
+    /**
+     * Execute a batch insert operation and return an array of modified rows.
+     * @param batchInsert batch insert configuration parameter
+     * @return array of modified rows per insert.
+     * @param <T> type of rows to map to inserts
+     */
+    default <T> int[] insert(BatchInsert<T> batchInsert) {
+        if (batchInsert.rows().isEmpty()) {
+            return new int[] {};
+        }
+        String sql = generateInsertSql(this, batchInsert);
+
+        Collection<Function<? super T, Object>> mappings = batchInsert.escapedMappings().values();
+        Collection<Object> escapedConstants = batchInsert.escapedConstants().values();
+        int paramsPerRow = mappings.size() + escapedConstants.size();
+        List<Object[]> allParams = new ArrayList<>();
+
+        for (T row : batchInsert.rows()) {
+            Object[] rowParams = new Object[paramsPerRow];
+            int index = 0;
+            for (var fn : mappings) {
+                rowParams[index++] = fn.apply(row);
+            }
+            for (var constant : escapedConstants) {
+                rowParams[index++] = constant;
+            }
+            allParams.add(rowParams);
+        }
+
+        return getJdbcTemplate().batchUpdate(sql, allParams);
+    }
+
+    /**
+     * Execute a batch insert operation and return an array of generated keys.
+     * @param batchInsert batch insert configuration parameter
+     * @return list of generated keys per row insert.
+     * @param <T> type of rows to map to inserts
+     */
+    default <T> List<Number> insertReturningNumbers(BatchInsert<T> batchInsert) {
+        if (batchInsert.rows().isEmpty()) {
+            return List.of();
+        }
+        List<T> rows = batchInsert.rows();
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        Collection<Function<? super T, Object>> mappings = batchInsert.escapedMappings().values();
+        Collection<Object> escapedConstants = batchInsert.escapedConstants().values();
+
+        String sql = generateInsertSql(this, batchInsert);
+        getJdbcTemplate().batchUpdate(
+                connection -> connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS),
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        T row = rows.get(i);
+                        int paramIndex = 1;
+                        for (var fn : mappings) {
+                            ps.setObject(paramIndex++, fn.apply(row));
+                        }
+                        for (var constant : escapedConstants) {
+                            ps.setObject(paramIndex++, constant);
+                        }
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return rows.size();
+                    }
+                },
+                keyHolder
+        );
+
+        List<Number> generatedKeys = new ArrayList<>();
+        for (var rowKeys : keyHolder.getKeyList()) {
+            Object firstKey = new ArrayList<>(rowKeys.values()).getFirst();
+            if (firstKey instanceof Number number) {
+                generatedKeys.add(number);
+            } else {
+                throw new DataRetrievalFailureException("The generated key type is not an instanceof Number, found " + firstKey.getClass().getName());
+            }
+        }
+        return generatedKeys;
     }
 
 }
