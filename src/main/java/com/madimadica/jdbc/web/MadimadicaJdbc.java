@@ -682,4 +682,25 @@ public interface MadimadicaJdbc {
         return generatedKeys;
     }
 
+    /**
+     * Create a new fluent API builder to delete from the given table.
+     * @param tableName name of the table to delete from
+     * @return a fluent API builder to configure the WHERE clause
+     */
+    default DeleteFromBuilder deleteFrom(String tableName) {
+        return new DeleteFromBuilder(this, tableName);
+    }
+
+    /**
+     * Execute a DELETE FROM query
+     * @param deleteFrom parameter type with delete configuration
+     * @return number of rows affected
+     */
+    default int deleteFrom(DeleteFrom deleteFrom) {
+        String sql = "DELETE FROM " + wrapIdentifier(deleteFrom.tableName()) +
+                " WHERE " + deleteFrom.whereClause();
+
+        Object[] params = deleteFrom.whereParams().toArray();
+        return getJdbcTemplate().update(sql, params);
+    }
 }
