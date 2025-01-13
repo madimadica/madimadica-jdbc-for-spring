@@ -14,7 +14,7 @@ This library is available in Maven Central.
 <dependency>
     <groupId>com.madimadica</groupId>
     <artifactId>madimadica-jdbc-for-spring</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -40,9 +40,12 @@ Out of the box, the supported dialects are
 
 ### Adding a new Dialect
 The `interface` at the base of the inheritence chain is `MadimadicaJdbc`. Most of the functionality
-is defined by this interface with default methods. So, if you extend it,
-you only need to implement `wrapIdentifier(String)` for the new dialect.
-Remember to make your new `MadimadicaJdbc` implementation a bean.
+is defined by this interface with default methods. However, due to
+the weirdness around batch inserts across different databases,
+you should actually extend from `JdbcWithExplicitBatchInsertID` or `JdbcWithImplicitBatchInsertID`
+to inherit the proper behavior for them. In either case you will need to implement `wrapIdentifier(String)`
+for the new dialect, which handles special quote characters. Also, remember to make the new implementation
+a bean for ease of access.
 
 ### Using a Dialect
 To use a dialect implementation, such as in your service layer, simply add it
@@ -371,6 +374,9 @@ jdbcImpl.insertInto("serves")
 ### Batch Insert Fluent API
 This is used to perform a batch of `INSERT` queries. The return value depends on the terminal operation.
 
+Note that there are two variations of this API, one for explicit generated IDs, and one for implicit generated IDs.
+This only makes a difference if you have generated IDs and want to fetch them.
+
 To open the API, begin with `batchInsertInto(String tableName, List<T> rows)`. This returns an instance
 of a fluent builder. The `List<T>` rows is the list of objects to derive mapped inserts from.
 
@@ -381,24 +387,40 @@ with `value(String column, Function<? super T, Object> valueMapper)`.
 Finally, close the API with a terminal insert method, similar to a Row Insert. This can be `int[] insert()`
 to insert and return the list of rows affected per query (should be an array of all 1s). It can also be
 one of the methods to return generated ids, per row, returned in the same encounter order as the original
-`List<T> rows` iterator. They are
+`List<T> rows` iterator. These depend on whether you have implicit or explicit ID handling.
 
+For implicit IDs, the signatures are
 * `List<Integer> insertReturningInts()`
 * `List<Long> insertReturningLongs()`
 * `List<Number> insertReturningNumbers()`
 
-Any of these 4 terminal methods will perform the batch insert queries. However, if the `List<T> rows` is empty,
+For explicit IDs, the signatures are
+* `List<Integer> insertReturningInts(String generatedColumn)`
+* `List<Long> insertReturningLongs(String generatedColumn)`
+* `List<Number> insertReturningNumbers(String generatedColumn)`
+
+Any of these terminal methods will perform the batch insert queries. However, if the `List<T> rows` is empty,
 no queries are performed.
 
 #### Examples
 ```java
-List<Long> userIds = jdbcImpl.batchInsertInto("users", newUsers)
+List<Long> userIds = mySqlImpl.batchInsertInto("users", newUsers)
         .value("first_name", CreateUserDTO::firstName)
         .value("last_name", CreateUserDTO::lastName)
         .value("email", CreateUserDTO::email)
         .value("inserted_by", actor)
         .valueUnescaped("inserted_at", "GETDATE()")
         .insertReturningLongs();
+```
+
+```java
+List<Long> userIds = sqlServerImpl.batchInsertInto("users", newUsers)
+        .value("first_name", CreateUserDTO::firstName)
+        .value("last_name", CreateUserDTO::lastName)
+        .value("email", CreateUserDTO::email)
+        .value("inserted_by", actor)
+        .valueUnescaped("inserted_at", "GETDATE()")
+        .insertReturningLongs("id");
 ```
 
 ```java
