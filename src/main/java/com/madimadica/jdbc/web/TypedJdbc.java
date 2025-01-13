@@ -14,7 +14,13 @@ import java.util.Optional;
  * @param <T> type of query results
  */
 public class TypedJdbc<T> {
+    /**
+     * Jdbc wrapper instance to use for queries
+     */
     protected final MadimadicaJdbc jdbc;
+    /**
+     * RowMapper to map query results by
+     */
     protected final RowMapper<T> rowMapper;
 
     /**
