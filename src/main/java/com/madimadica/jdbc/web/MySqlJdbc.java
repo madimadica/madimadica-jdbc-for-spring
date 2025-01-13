@@ -11,7 +11,7 @@ import java.util.StringJoiner;
  * Wrapper for Spring JDBC with MySQL dialect.
  */
 @Component
-public class MySqlJdbc implements MadimadicaJdbc {
+public class MySqlJdbc implements JdbcWithImplicitBatchInsertID {
     private final JdbcTemplate jdbc;
     private final NamedParameterJdbcTemplate namedJdbc;
 
@@ -67,7 +67,7 @@ public class MySqlJdbc implements MadimadicaJdbc {
         }
         sb.append(identifier, lastStart, len);
         // Split by '.' and join back with escapes
-        List<String> parts = InternalStringUtils.splitChar(sb.toString(), '.');
+        List<String> parts = InternalUtils.splitChar(sb.toString(), '.');
         StringJoiner fullIdentifier = new StringJoiner(".");
         for (String part : parts) {
             fullIdentifier.add('`' + part + '`');

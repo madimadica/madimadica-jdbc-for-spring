@@ -11,9 +11,18 @@ import java.util.StringJoiner;
  * Wrapper for Spring JDBC with SQL Server dialect.
  */
 @Component
-public class SqlServerJdbc implements MadimadicaJdbc {
+public class SqlServerJdbc implements JdbcWithExplicitBatchInsertID {
     private final JdbcTemplate jdbc;
     private final NamedParameterJdbcTemplate namedJdbc;
+
+    /**
+     * Parameter limit for SQL Server driver
+     */
+    public static final int MAX_PARAMS_PER_QUERY = 2099;
+    /**
+     * Insert Limit for SQL Server driver
+     */
+    public static final int MAX_INSERTS_PER_QUERY = 1000;
 
     /**
      * Construct this as a bean
@@ -65,12 +74,22 @@ public class SqlServerJdbc implements MadimadicaJdbc {
         }
         sb.append(identifier, lastStart, len);
         // Split by '.' and join back with escapes
-        List<String> parts = InternalStringUtils.splitChar(sb.toString(), '.');
+        List<String> parts = InternalUtils.splitChar(sb.toString(), '.');
         StringJoiner fullIdentifier = new StringJoiner(".");
         for (String part : parts) {
             fullIdentifier.add('[' + part + ']');
         }
         return fullIdentifier.toString();
+    }
+
+    @Override
+    public int getMaxParametersPerQuery() {
+        return MAX_PARAMS_PER_QUERY;
+    }
+
+    @Override
+    public int getMaxInsertsPerQuery() {
+        return MAX_INSERTS_PER_QUERY;
     }
 
 }

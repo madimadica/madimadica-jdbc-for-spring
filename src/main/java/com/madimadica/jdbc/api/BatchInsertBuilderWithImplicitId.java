@@ -1,6 +1,6 @@
 package com.madimadica.jdbc.api;
 
-import com.madimadica.jdbc.web.MadimadicaJdbc;
+import com.madimadica.jdbc.web.JdbcWithImplicitBatchInsertID;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,10 +9,12 @@ import java.util.function.Function;
 
 /**
  * Fluent builder implementation for defining a {@link BatchInsert}.
+ * For data sources that can implicitly return generated IDs for each row.
  * @param <T> type of the rows to insert in this batch
  */
-public class BatchInsertBuilder<T> implements BatchInsertBuilderSteps.AdditionalValues<T> {
-    private final MadimadicaJdbc jdbcImpl;
+public class BatchInsertBuilderWithImplicitId<T> implements
+        BatchInsertBuilderSteps.AdditionalValuesWithImplicitID<T> {
+    private final JdbcWithImplicitBatchInsertID jdbcImpl;
     private final String tableName;
     private final List<T> rows;
     private final Map<String, Function<? super T, Object>> escapedMappings = new LinkedHashMap<>();
@@ -25,26 +27,26 @@ public class BatchInsertBuilder<T> implements BatchInsertBuilderSteps.Additional
      * @param tableName name of the table to insert into
      * @param rows list of rows to insert
      */
-    public BatchInsertBuilder(MadimadicaJdbc jdbcImpl, String tableName, List<T> rows) {
+    public BatchInsertBuilderWithImplicitId(JdbcWithImplicitBatchInsertID jdbcImpl, String tableName, List<T> rows) {
         this.jdbcImpl = jdbcImpl;
         this.tableName = tableName;
         this.rows = rows;
     }
 
     @Override
-    public BatchInsertBuilderSteps.AdditionalValues<T> value(String column, Object escapedConstant) {
+    public BatchInsertBuilderSteps.AdditionalValuesWithImplicitID<T> value(String column, Object escapedConstant) {
         this.escapedConstants.put(column, escapedConstant);
         return this;
     }
 
     @Override
-    public BatchInsertBuilderSteps.AdditionalValues<T> valueUnescaped(String column, Object unescapedConstant) {
+    public BatchInsertBuilderSteps.AdditionalValuesWithImplicitID<T> valueUnescaped(String column, Object unescapedConstant) {
         this.unescapedConstants.put(column, unescapedConstant);
         return this;
     }
 
     @Override
-    public BatchInsertBuilderSteps.AdditionalValues<T> value(String column, Function<? super T, Object> valueMapper) {
+    public BatchInsertBuilderSteps.AdditionalValuesWithImplicitID<T> value(String column, Function<? super T, Object> valueMapper) {
         this.escapedMappings.put(column, valueMapper);
         return this;
     }
