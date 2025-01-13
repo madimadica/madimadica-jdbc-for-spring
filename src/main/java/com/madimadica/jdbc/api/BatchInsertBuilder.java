@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 /**
  * Fluent builder implementation for defining a {@link BatchInsert}.
+ * @param <T> type of the rows to insert in this batch
  */
 public class BatchInsertBuilder<T> implements BatchInsertBuilderSteps.AdditionalValues<T> {
     private final MadimadicaJdbc jdbcImpl;
