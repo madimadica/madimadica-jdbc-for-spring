@@ -125,7 +125,7 @@ public interface MadimadicaJdbc {
      * @param sql SQL query
      * @param rowMapper function to map the resulting row
      * @return an optionally mapped row.
-     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     * @throws IncorrectResultSizeDataAccessException if the query results in more than 1 row
      * @param <T> type of the Optional result
      */
     default <T> Optional<T> queryOne(String sql, RowMapper<T> rowMapper) {
@@ -139,7 +139,7 @@ public interface MadimadicaJdbc {
      * @param rowMapper function to map the resulting row
      * @param args varargs parameters, which are flattened according to {@link FlattenedParameters#of(String, Object...)}
      * @return an optionally mapped row.
-     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     * @throws IncorrectResultSizeDataAccessException if the query results in more than 1 row
      * @param <T> type of the Optional result
      */
     default <T> Optional<T> queryOne(String sql, RowMapper<T> rowMapper, Object... args) {
@@ -153,7 +153,7 @@ public interface MadimadicaJdbc {
      * @param rowMapper function to map the resulting row
      * @param namedArgs map of named parameters
      * @return an optionally mapped row.
-     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     * @throws IncorrectResultSizeDataAccessException if the query results in more than 1 row
      * @param <T> type of the Optional result
      */
     default <T> Optional<T> queryOne(String sql, RowMapper<T> rowMapper, Map<String, ?> namedArgs) {
@@ -165,7 +165,7 @@ public interface MadimadicaJdbc {
      * If there are multiple results, an exception is thrown.
      * @param results list of row results
      * @return an optionally mapped row.
-     * @throws IncorrectResultSizeDataAccessException if the query results more than 1 row
+     * @throws IncorrectResultSizeDataAccessException if the query results in more than 1 row
      * @param <T> type of the Optional result.
      */
     private static <T> Optional<T> queryOneHelper(List<T> results) {
