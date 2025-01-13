@@ -33,7 +33,7 @@ public final class RowUpdateBuilderSteps {
          * @param changes Map of column name-value mappings
          * @return {@link Last} step builder
          */
-        Last set(Map<String, Object> changes);
+        Last set(Map<String, ?> changes);
 
         /**
          * Set a column by name to an <strong>unescaped</strong> value.
@@ -58,7 +58,7 @@ public final class RowUpdateBuilderSteps {
          * @param changes Map of column name-value mappings
          * @return {@link Last} step builder
          */
-        Last setUnescaped(Map<String, Object> changes);
+        Last setUnescaped(Map<String, ?> changes);
     }
 
     /**
@@ -76,7 +76,7 @@ public final class RowUpdateBuilderSteps {
          *      <code>whereIdEquals(value)</code>  is equivalent to invoking <code>where("id = ?", value)</code>
          * </p>
          * @param id ID to check for equality, escaped
-         * @return {@link int} number of rows affected
+         * @return int number of rows affected
          */
         default int whereIdEquals(Object id) {
             return this.where("id = ?", id);
@@ -88,7 +88,7 @@ public final class RowUpdateBuilderSteps {
          *      <code>whereIdIn(ids)</code> is equivalent to invoking <code>where("id = IN (?)", ids)</code>
          * </p>
          * @param ids list of ID values to check for containment, each escaped
-         * @return {@link int} number of rows affected
+         * @return int number of rows affected
          */
         default int whereIdIn(List<?> ids) {
             return this.where("id IN (?)", ids);
@@ -106,7 +106,7 @@ public final class RowUpdateBuilderSteps {
          * @param whereParams varargs parameters, which are flattened according to {@link FlattenedParameters#of(String, Object...)}
          * @throws IndexOutOfBoundsException if there are not enough varargs for the parameters.
          * @throws IllegalArgumentException if there are more varargs than parameters.
-         * @return {@link int} number of rows affected
+         * @return int number of rows affected
          */
         int where(String whereClause, Object... whereParams);
     }

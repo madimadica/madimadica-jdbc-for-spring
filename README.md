@@ -14,7 +14,7 @@ This library is available in Maven Central.
 <dependency>
     <groupId>com.madimadica</groupId>
     <artifactId>madimadica-jdbc-for-spring</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -249,7 +249,7 @@ so they should only be used with hardcoded or trusted constants. To set an escap
 and to set an unescaped value, use `setUnescaped(String column, Object value)`. The first argument defines
 the column to update, and the second argument defines the new value.
 
-You can also set multiple things in a single method call with `set(Map<String, Object> changes)` and `setUnescaped(Map<String, Object> changes)`.
+You can also set multiple things in a single method call with `set(Map<String, ?> changes)` and `setUnescaped(Map<String, ?> changes)`.
 These behave the same in terms of escaping, and take keys as the column name, and values as the value to assign.
 
 The terminal `where` method expects a `String sql` and `Object... args`, flattened in the same way as other varargs queries.

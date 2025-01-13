@@ -30,7 +30,7 @@ public class RowUpdateBuilder implements RowUpdateBuilderSteps.Last {
     }
 
     @Override
-    public RowUpdateBuilderSteps.Last set(Map<String, Object> changes) {
+    public RowUpdateBuilderSteps.Last set(Map<String, ?> changes) {
         this.escapedUpdates.putAll(changes);
         return this;
     }
@@ -42,7 +42,7 @@ public class RowUpdateBuilder implements RowUpdateBuilderSteps.Last {
     }
 
     @Override
-    public RowUpdateBuilderSteps.Last setUnescaped(Map<String, Object> changes) {
+    public RowUpdateBuilderSteps.Last setUnescaped(Map<String, ?> changes) {
         this.uncapedUpdates.putAll(changes);
         return this;
     }
