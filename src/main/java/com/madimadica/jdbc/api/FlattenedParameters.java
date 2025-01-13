@@ -3,6 +3,7 @@ package com.madimadica.jdbc.api;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * Internal data structure representing a parameterized SQL string
@@ -63,7 +64,7 @@ public record FlattenedParameters(
                 Object currentParam = paramList.get(paramIndex++);
                 if (currentParam instanceof Collection<?> collection) {
                     sqlBuilder.append(sql, lastStart, i);
-                    sqlBuilder.append(InternalSqlUtils.getParameters(collection.size()));
+                    sqlBuilder.append(getParameters(collection.size()));
                     lastStart = i + 1;
                     flattenedParams.addAll(collection);
                 } else {
@@ -76,5 +77,24 @@ public record FlattenedParameters(
         }
         sqlBuilder.append(sql, lastStart, len);
         return new FlattenedParameters(sqlBuilder.toString(), flattenedParams);
+    }
+
+    /**
+     * Convert a size into a CSV of parameters. For example,
+     * <pre>
+     *     getParameters(0) // ""
+     *     getParameters(1) // "?"
+     *     getParameters(2) // "?, ?"
+     *     getParameters(3) // "?, ?, ?"
+     * </pre>
+     * @param size number of parameters to create
+     * @return parameterized string
+     */
+    private static String getParameters(int size) {
+        StringJoiner sj = new StringJoiner(", ");
+        for (int i = 0; i < size; ++i) {
+            sj.add("?");
+        }
+        return sj.toString();
     }
 }
