@@ -23,6 +23,7 @@ public interface JdbcWithExplicitBatchInsertID extends MadimadicaJdbc {
      * @return fluent API builder to finish defining the insert.
      */
     default <T> BatchInsertBuilderSteps.RequiredValue<T, BatchInsertBuilderSteps.AdditionalValuesWithExplicitID<T>> batchInsertInto(String tableName, List<T> rows) {
+        getLogger().debug("Using [batchInsertInto] (Explicit IDs) API");
         return new BatchInsertBuilderWithExplicitId<>(this, tableName, rows);
     }
 
@@ -48,6 +49,7 @@ public interface JdbcWithExplicitBatchInsertID extends MadimadicaJdbc {
     default <T> List<Number> insertReturningNumbers(BatchInsert<T> batchInsert, String generatedColumn) {
         final List<T> rows = batchInsert.rows();
         if (rows.isEmpty()) {
+            getLogger().debug("No rows in batch insert");
             return List.of();
         }
         StringJoiner sjColumnNames = new StringJoiner(", ", " (", ") ");
@@ -85,6 +87,7 @@ public interface JdbcWithExplicitBatchInsertID extends MadimadicaJdbc {
         // ",(?,?,?,GETDATE())"
         final String valuesTemplateWithComma = "," + valuesTemplate;
 
+
         int batchSize = rows.size();
         if (paramsPerRow * batchSize > getMaxParametersPerQuery()) {
             batchSize = getMaxParametersPerQuery() / paramsPerRow;
@@ -95,6 +98,8 @@ public interface JdbcWithExplicitBatchInsertID extends MadimadicaJdbc {
 
         final List<List<T>> batches = InternalUtils.partitionBySize(rows, batchSize);
         final List<Number> generatedValues = new ArrayList<>(rows.size());
+
+        getLogger().debug("Batch inserting {} rows ({} batches): {}{}", rows.size(), batches.size(), sqlPrefix, valuesTemplate);
 
         for (List<T> batch : batches) {
             final int rowCount = batch.size();

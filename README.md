@@ -14,7 +14,7 @@ This library is available in Maven Central.
 <dependency>
     <groupId>com.madimadica</groupId>
     <artifactId>madimadica-jdbc-for-spring</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -32,6 +32,10 @@ You are now ready to use the library, please see the examples and documentation 
 ---
 
 ## Documentation
+
+### Logging
+You can configure the logging level of package `com.madimadica.jdbc.web` using SLF4J. To see queries, use `DEBUG` logging.
+Currently, there is nothing using `INFO`.
 
 ### Supported Dialects
 Out of the box, the supported dialects are

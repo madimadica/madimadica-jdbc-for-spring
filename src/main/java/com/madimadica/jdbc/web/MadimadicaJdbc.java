@@ -1,6 +1,7 @@
 package com.madimadica.jdbc.web;
 
 import com.madimadica.jdbc.api.*;
+import org.slf4j.Logger;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,6 +32,12 @@ public interface MadimadicaJdbc {
     NamedParameterJdbcTemplate getNamedJdbcTemplate();
 
     /**
+     * Get the logger for this JDBC wrapper implementation
+     * @return logger instance
+     */
+    Logger getLogger();
+
+    /**
      * <p>
      *     Wrap an identifier into a standard quoted identifier, as per the dialect.
      * </p>
@@ -47,6 +54,7 @@ public interface MadimadicaJdbc {
      * @param sql to execute
      */
     default void execute(String sql) {
+        getLogger().debug(sql);
         getJdbcTemplate().execute(sql);
     }
 
@@ -56,6 +64,7 @@ public interface MadimadicaJdbc {
      * @return rows affected
      */
     default int update(String sql) {
+        getLogger().debug(sql);
         return getJdbcTemplate().update(sql);
     }
 
@@ -66,6 +75,7 @@ public interface MadimadicaJdbc {
      * @return number of modified rows
      */
     default int update(String sql, Object... args) {
+        getLogger().debug(sql);
         var flattened = FlattenedParameters.of(sql, args);
         return getJdbcTemplate().update(flattened.sql(), flattened.toArray());
     }
@@ -77,6 +87,7 @@ public interface MadimadicaJdbc {
      * @return number of modified rows
      */
     default int update(String sql, Map<String, ?> namedArgs) {
+        getLogger().debug(sql);
         return getNamedJdbcTemplate().update(sql, namedArgs);
     }
 
@@ -88,6 +99,7 @@ public interface MadimadicaJdbc {
      * @param <T> type of the result
      */
     default <T> List<T> query(String sql, RowMapper<T> rowMapper) {
+        getLogger().debug(sql);
         return getJdbcTemplate().query(sql, rowMapper);
     }
 
@@ -100,6 +112,7 @@ public interface MadimadicaJdbc {
      * @param <T> type of the result
      */
     default <T> List<T> query(String sql, RowMapper<T> rowMapper, Object... args) {
+        getLogger().debug(sql);
         var flattened = FlattenedParameters.of(sql, args);
         return getJdbcTemplate().query(flattened.sql(), rowMapper, flattened.toArray());
     }
@@ -113,6 +126,7 @@ public interface MadimadicaJdbc {
      * @param <T> type of the result
      */
     default <T> List<T> query(String sql, RowMapper<T> rowMapper, Map<String, ?> namedArgs) {
+        getLogger().debug(sql);
         return getNamedJdbcTemplate().query(sql, namedArgs, rowMapper);
     }
 
@@ -180,6 +194,7 @@ public interface MadimadicaJdbc {
      * @return a list of longs
      */
     default List<Long> queryLongs(String sql) {
+        getLogger().debug(sql);
         return getJdbcTemplate().queryForList(sql, Long.class);
     }
 
@@ -190,6 +205,7 @@ public interface MadimadicaJdbc {
      * @return a list of longs
      */
     default List<Long> queryLongs(String sql, Object... args) {
+        getLogger().debug(sql);
         var flattened = FlattenedParameters.of(sql, args);
         return getJdbcTemplate().queryForList(flattened.sql(), Long.class, flattened.toArray());
     }
@@ -201,6 +217,7 @@ public interface MadimadicaJdbc {
      * @return a list of longs
      */
     default List<Long> queryLongs(String sql, Map<String, ?> namedArgs) {
+        getLogger().debug(sql);
         return getNamedJdbcTemplate().queryForList(sql, namedArgs, Long.class);
     }
 
@@ -210,6 +227,7 @@ public interface MadimadicaJdbc {
      * @return a list of integers
      */
     default List<Integer> queryInts(String sql) {
+        getLogger().debug(sql);
         return getJdbcTemplate().queryForList(sql, Integer.class);
     }
 
@@ -220,6 +238,7 @@ public interface MadimadicaJdbc {
      * @return a list of integers
      */
     default List<Integer> queryInts(String sql, Object... args) {
+        getLogger().debug(sql);
         var flattened = FlattenedParameters.of(sql, args);
         return getJdbcTemplate().queryForList(flattened.sql(), Integer.class, flattened.toArray());
     }
@@ -231,6 +250,7 @@ public interface MadimadicaJdbc {
      * @return a list of integers
      */
     default List<Integer> queryInts(String sql, Map<String, ?> namedArgs) {
+        getLogger().debug(sql);
         return getNamedJdbcTemplate().queryForList(sql, namedArgs, Integer.class);
     }
 
@@ -240,6 +260,7 @@ public interface MadimadicaJdbc {
      * @return a list of strings
      */
     default List<String> queryStrings(String sql) {
+        getLogger().debug(sql);
         return getJdbcTemplate().queryForList(sql, String.class);
     }
 
@@ -250,6 +271,7 @@ public interface MadimadicaJdbc {
      * @return a list of integers
      */
     default List<String> queryStrings(String sql, Object... args) {
+        getLogger().debug(sql);
         var flattened = FlattenedParameters.of(sql, args);
         return getJdbcTemplate().queryForList(flattened.sql(), String.class, flattened.toArray());
     }
@@ -261,6 +283,7 @@ public interface MadimadicaJdbc {
      * @return a list of strings
      */
     default List<String> queryStrings(String sql, Map<String, ?> namedArgs) {
+        getLogger().debug(sql);
         return getNamedJdbcTemplate().queryForList(sql, namedArgs, String.class);
     }
 
@@ -376,6 +399,7 @@ public interface MadimadicaJdbc {
      * @return fluent API builder to finish defining the update.
      */
     default RowUpdateBuilderSteps.First updateTable(String tableName) {
+        getLogger().debug("Using [updateTable] API");
         return new RowUpdateBuilder(this, tableName);
     }
 
@@ -407,6 +431,7 @@ public interface MadimadicaJdbc {
         sql.append(rowUpdate.whereClause());
 
         Object[] params = rowUpdate.getParams().toArray();
+        getLogger().debug(sql.toString());
         return getJdbcTemplate().update(sql.toString(), params);
     }
 
@@ -420,6 +445,7 @@ public interface MadimadicaJdbc {
      * @param <T> type of rows to map updates on
      */
     default <T> BatchUpdateBuilderSteps.First<T> batchUpdate(String tableName, List<T> rows) {
+        getLogger().debug("Using [batchUpdate] API");
         return new BatchUpdateBuilder<>(this, tableName, rows);
     }
 
@@ -437,6 +463,7 @@ public interface MadimadicaJdbc {
      */
     default <T> int[] update(BatchUpdate<T> batchUpdate) {
         if (batchUpdate.isEmpty()) {
+            getLogger().debug("No rows in batch update");
             return new int[] {};
         }
         StringBuilder sql = new StringBuilder("UPDATE ");
@@ -476,6 +503,7 @@ public interface MadimadicaJdbc {
             }
             allParams.add(args);
         }
+        getLogger().debug("Batch updating {} rows: {}", batchUpdate.rows().size(), sql);
         return getJdbcTemplate().batchUpdate(sql.toString(), allParams);
     }
 
@@ -487,6 +515,7 @@ public interface MadimadicaJdbc {
      * @return fluent API builder to finish defining the insert.
      */
     default RowInsertBuilderSteps.RequiredValue insertInto(String tableName) {
+        getLogger().debug("Using [insertInto] API");
         return new RowInsertBuilder(this, tableName);
     }
 
@@ -499,6 +528,7 @@ public interface MadimadicaJdbc {
      */
     default int insert(RowInsert rowInsert) {
         String sql = InternalUtils.generateInsertSql(this, rowInsert);
+        getLogger().debug(sql);
         return this.update(sql, rowInsert.escapedValues().size());
     }
 
@@ -510,6 +540,7 @@ public interface MadimadicaJdbc {
      */
     default Number insertReturningNumber(RowInsert rowInsert) {
         String sql = InternalUtils.generateInsertSql(this, rowInsert);
+        getLogger().debug(sql);
         KeyHolder keyHolder = new GeneratedKeyHolder();
         int rowsAffected = getJdbcTemplate().update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -530,9 +561,11 @@ public interface MadimadicaJdbc {
      */
     default <T> int[] insert(BatchInsert<T> batchInsert) {
         if (batchInsert.rows().isEmpty()) {
+            getLogger().debug("No rows in batch insert");
             return new int[] {};
         }
         String sql = InternalUtils.generateInsertSql(this, batchInsert);
+        getLogger().debug("Batch inserting {} rows: {}", batchInsert.rows().size(), sql);
 
         Collection<Function<? super T, Object>> mappings = batchInsert.escapedMappings().values();
         Collection<Object> escapedConstants = batchInsert.escapedConstants().values();
@@ -560,6 +593,7 @@ public interface MadimadicaJdbc {
      * @return a fluent API builder to configure the WHERE clause
      */
     default DeleteFromBuilder deleteFrom(String tableName) {
+        getLogger().debug("Using [deleteFrom] API");
         return new DeleteFromBuilder(this, tableName);
     }
 
@@ -571,7 +605,7 @@ public interface MadimadicaJdbc {
     default int deleteFrom(DeleteFrom deleteFrom) {
         String sql = "DELETE FROM " + wrapIdentifier(deleteFrom.tableName()) +
                 " WHERE " + deleteFrom.whereClause();
-
+        getLogger().debug(sql);
         Object[] params = deleteFrom.whereParams().toArray();
         return getJdbcTemplate().update(sql, params);
     }

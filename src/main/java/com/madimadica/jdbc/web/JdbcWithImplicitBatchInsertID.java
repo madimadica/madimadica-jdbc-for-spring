@@ -30,6 +30,7 @@ public interface JdbcWithImplicitBatchInsertID extends MadimadicaJdbc {
      * @return fluent API builder to finish defining the insert.
      */
     default <T> BatchInsertBuilderSteps.RequiredValue<T, BatchInsertBuilderSteps.AdditionalValuesWithImplicitID<T>> batchInsertInto(String tableName, List<T> rows) {
+        getLogger().debug("Using [batchInsertInto] (Implicit IDs) API");
         return new BatchInsertBuilderWithImplicitId<>(this, tableName, rows);
     }
 
@@ -41,6 +42,7 @@ public interface JdbcWithImplicitBatchInsertID extends MadimadicaJdbc {
      */
     default <T> List<Number> insertReturningNumbers(BatchInsert<T> batchInsert) {
         if (batchInsert.rows().isEmpty()) {
+            getLogger().debug("No rows in batch insert");
             return List.of();
         }
         List<T> rows = batchInsert.rows();
@@ -49,6 +51,8 @@ public interface JdbcWithImplicitBatchInsertID extends MadimadicaJdbc {
         Collection<Object> escapedConstants = batchInsert.escapedConstants().values();
 
         String sql = InternalUtils.generateInsertSql(this, batchInsert);
+        getLogger().debug("Batch inserting {} rows: {}", rows.size(), sql);
+
         getJdbcTemplate().batchUpdate(
                 connection -> connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS),
                 new BatchPreparedStatementSetter() {

@@ -1,5 +1,7 @@
 package com.madimadica.jdbc.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,7 @@ import java.util.StringJoiner;
  */
 @Component
 public class MySqlJdbc implements JdbcWithImplicitBatchInsertID {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MySqlJdbc.class);
     private final JdbcTemplate jdbc;
     private final NamedParameterJdbcTemplate namedJdbc;
 
@@ -33,6 +36,11 @@ public class MySqlJdbc implements JdbcWithImplicitBatchInsertID {
     @Override
     public NamedParameterJdbcTemplate getNamedJdbcTemplate() {
         return namedJdbc;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return LOGGER;
     }
 
     /**
