@@ -34,8 +34,18 @@ You are now ready to use the library, please see the examples and documentation 
 ## Documentation
 
 ### Logging
-You can configure the logging level of package `com.madimadica.jdbc.web` using SLF4J. To see queries, use `DEBUG` logging.
-Currently, there is nothing using `INFO`.
+You can configure the logging level of package `com.madimadica.jdbc.web` using SLF4J.
+To see queries, use `DEBUG` logging. To see additional info when opening a fluent API,
+use `TRACE` logging. Currently, there is nothing that uses `INFO` level.
+
+An example `logback-spring.xml` is as follows. Without `additivity="false"` then logs
+could be duplicated with the INFO config.
+
+```xml
+<logger name="com.madimadica.jdbc.web" level="DEBUG" additivity="false">
+    <appender-ref ref="Console" />
+</logger>
+```
 
 ### Supported Dialects
 Out of the box, the supported dialects are

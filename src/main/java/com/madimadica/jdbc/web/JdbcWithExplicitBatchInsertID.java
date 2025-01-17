@@ -23,7 +23,7 @@ public interface JdbcWithExplicitBatchInsertID extends MadimadicaJdbc {
      * @return fluent API builder to finish defining the insert.
      */
     default <T> BatchInsertBuilderSteps.RequiredValue<T, BatchInsertBuilderSteps.AdditionalValuesWithExplicitID<T>> batchInsertInto(String tableName, List<T> rows) {
-        getLogger().debug("Using [batchInsertInto] (Explicit IDs) API");
+        getLogger().trace("Using [batchInsertInto] (Explicit IDs) API");
         return new BatchInsertBuilderWithExplicitId<>(this, tableName, rows);
     }
 

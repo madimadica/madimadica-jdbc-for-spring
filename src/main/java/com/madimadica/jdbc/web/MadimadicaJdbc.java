@@ -399,7 +399,7 @@ public interface MadimadicaJdbc {
      * @return fluent API builder to finish defining the update.
      */
     default RowUpdateBuilderSteps.First updateTable(String tableName) {
-        getLogger().debug("Using [updateTable] API");
+        getLogger().trace("Using [updateTable] API");
         return new RowUpdateBuilder(this, tableName);
     }
 
@@ -445,7 +445,7 @@ public interface MadimadicaJdbc {
      * @param <T> type of rows to map updates on
      */
     default <T> BatchUpdateBuilderSteps.First<T> batchUpdate(String tableName, List<T> rows) {
-        getLogger().debug("Using [batchUpdate] API");
+        getLogger().trace("Using [batchUpdate] API");
         return new BatchUpdateBuilder<>(this, tableName, rows);
     }
 
@@ -515,7 +515,7 @@ public interface MadimadicaJdbc {
      * @return fluent API builder to finish defining the insert.
      */
     default RowInsertBuilderSteps.RequiredValue insertInto(String tableName) {
-        getLogger().debug("Using [insertInto] API");
+        getLogger().trace("Using [insertInto] API");
         return new RowInsertBuilder(this, tableName);
     }
 
@@ -593,7 +593,7 @@ public interface MadimadicaJdbc {
      * @return a fluent API builder to configure the WHERE clause
      */
     default DeleteFromBuilder deleteFrom(String tableName) {
-        getLogger().debug("Using [deleteFrom] API");
+        getLogger().trace("Using [deleteFrom] API");
         return new DeleteFromBuilder(this, tableName);
     }
 
