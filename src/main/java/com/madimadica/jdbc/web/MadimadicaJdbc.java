@@ -529,7 +529,7 @@ public interface MadimadicaJdbc {
     default int insert(RowInsert rowInsert) {
         String sql = InternalUtils.generateInsertSql(this, rowInsert);
         getLogger().debug(sql);
-        return this.update(sql, rowInsert.escapedValues().size());
+        return this.update(sql, rowInsert.escapedValues().values().toArray());
     }
 
     /**
