@@ -75,7 +75,7 @@ class InternalUtils {
      * @return SQL query string, with escaped parameters, if any
      */
     static <T> String generateInsertSql(MadimadicaJdbc jdbcImpl, BatchInsert<T> batchInsert) {
-        StringJoiner columnNames = new StringJoiner(", ", "(", ")");
+        StringJoiner columnNames = new StringJoiner(", ", " (", ")");
         for (String col : batchInsert.escapedMappings().keySet()) {
             columnNames.add(jdbcImpl.wrapIdentifier(col));
         }
@@ -108,7 +108,7 @@ class InternalUtils {
      * @return SQL query string, with escaped parameters, if any
      */
     static String generateInsertSql(MadimadicaJdbc jdbcImpl, RowInsert rowInsert) {
-        StringJoiner columnNames = new StringJoiner(", ", "(", ")");
+        StringJoiner columnNames = new StringJoiner(", ", " (", ")");
         for (String col : rowInsert.escapedValues().keySet()) {
             columnNames.add(jdbcImpl.wrapIdentifier(col));
         }
