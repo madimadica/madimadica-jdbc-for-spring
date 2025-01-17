@@ -99,7 +99,15 @@ public interface JdbcWithExplicitBatchInsertID extends MadimadicaJdbc {
         final List<List<T>> batches = InternalUtils.partitionBySize(rows, batchSize);
         final List<Number> generatedValues = new ArrayList<>(rows.size());
 
-        getLogger().debug("Batch inserting {} rows ({} batches): {}{}", rows.size(), batches.size(), sqlPrefix, valuesTemplate);
+
+        getLogger().debug(
+                "Batch inserting {} rows ({} {}): {}{}",
+                rows.size(),
+                batches.size(),
+                batches.size() == 1 ? "batch" : "batches",
+                sqlPrefix,
+                valuesTemplate
+        );
 
         for (List<T> batch : batches) {
             final int rowCount = batch.size();
