@@ -14,7 +14,7 @@ This library is available in Maven Central.
 <dependency>
     <groupId>com.madimadica</groupId>
     <artifactId>madimadica-jdbc-for-spring</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 </dependency>
 ```
 

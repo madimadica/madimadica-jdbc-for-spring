@@ -53,7 +53,6 @@ public record FlattenedParameters(
      * @return {@link FlattenedParameters} parsed data of potentially expanded parameter collections.
      */
     public static FlattenedParameters of(String sql, Object... params) {
-        List<Object> paramList = List.of(params);
         int paramIndex = 0;
         List<Object> flattenedParams = new ArrayList<>();
         StringBuilder sqlBuilder = new StringBuilder();
@@ -61,7 +60,7 @@ public record FlattenedParameters(
         final int len = sql.length();
         for (int i = 0; i < len; ++i) {
             if (sql.charAt(i) == '?') {
-                Object currentParam = paramList.get(paramIndex++);
+                Object currentParam = params[paramIndex++];
                 if (currentParam instanceof Collection<?> collection) {
                     sqlBuilder.append(sql, lastStart, i);
                     sqlBuilder.append(getParameters(collection.size()));
