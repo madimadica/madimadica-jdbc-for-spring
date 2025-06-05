@@ -1,7 +1,7 @@
 name: Publish package to the Maven Central Repository
 on:
   workflow_dispatch:
-    
+
   push:
     tags:
       - v*
@@ -26,4 +26,4 @@ jobs:
           JRELEASER_GPG_SECRET_KEY:  ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
           JRELEASER_GPG_PUBLIC_KEY:  ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
           JRELEASER_GITHUB_TOKEN:    ${{ secrets.GITHUB_TOKEN }}
-        run: ./mvnw -Prelease deploy jreleaser:deploy -DaltDeploymentRepository=local::default::file:./target/staging-deploy -Djreleaser.dry.run=true
+        run: mvn -Prelease deploy jreleaser:deploy -DaltDeploymentRepository=local::default::file:./target/staging-deploy -Djreleaser.dry.run=true
