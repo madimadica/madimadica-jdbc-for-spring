@@ -31,6 +31,11 @@ public class PostgresJdbc implements JdbcWithExplicitBatchInsertID, JdbcRowInser
      */
     public static final int MAX_INSERTS_PER_QUERY = 10_000;
 
+    /**
+     * Construct this as a bean
+     * @param jdbc autowired JdbcTemplate instance
+     * @param namedJdbc autowired NamedParameterJdbcTemplate instance
+     */
     public PostgresJdbc(JdbcTemplate jdbc, NamedParameterJdbcTemplate namedJdbc) {
         this.jdbc = jdbc;
         this.namedJdbc = namedJdbc;

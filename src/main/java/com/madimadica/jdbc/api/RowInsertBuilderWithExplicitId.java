@@ -6,6 +6,9 @@ import org.springframework.jdbc.core.RowMapper;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Fluent builder implementation for defining a single {@link RowInsert}. Can also be configured to explicitly return generated values.
+ */
 public class RowInsertBuilderWithExplicitId implements RowInsertBuilderStepsWithExplicitId.AdditionalValues {
     private final JdbcRowInsertWithExplicitId jdbcImpl;
     private final String tableName;

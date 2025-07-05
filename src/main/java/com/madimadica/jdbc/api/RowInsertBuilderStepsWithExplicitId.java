@@ -61,6 +61,7 @@ public class RowInsertBuilderStepsWithExplicitId {
         /**
          * Execute an INSERT query for the configured row insert and maps the row with the given rowMapper.
          * @param rowMapper how to map the inserted row
+         * @param <T> type of the mapped row
          * @return the inserted row.
          */
         <T> T insertReturning(RowMapper<T> rowMapper);
