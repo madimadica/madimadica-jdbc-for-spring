@@ -13,7 +13,7 @@ import java.util.StringJoiner;
  * Wrapper for Spring JDBC with MySQL dialect.
  */
 @Component
-public class MySqlJdbc implements JdbcWithImplicitBatchInsertID {
+public class MySqlJdbc implements JdbcWithImplicitBatchInsertID, JdbcRowInsertWithImplicitId {
     private static final Logger LOGGER = LoggerFactory.getLogger(MySqlJdbc.class);
     private final JdbcTemplate jdbc;
     private final NamedParameterJdbcTemplate namedJdbc;

@@ -1,6 +1,6 @@
 package com.madimadica.jdbc.api;
 
-import com.madimadica.jdbc.web.MadimadicaJdbc;
+import com.madimadica.jdbc.web.JdbcRowInsertWithImplicitId;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -8,8 +8,8 @@ import java.util.Map;
 /**
  * Fluent builder implementation for defining a single {@link RowInsert}.
  */
-public class RowInsertBuilder implements RowInsertBuilderSteps.AdditionalValues {
-    private final MadimadicaJdbc jdbcImpl;
+public class RowInsertBuilderWithImplicitId implements RowInsertBuilderStepsWithImplicitId.AdditionalValues {
+    private final JdbcRowInsertWithImplicitId jdbcImpl;
     private final String tableName;
     private final Map<String, Object> escapedValues = new LinkedHashMap<>();
     private final Map<String, Object> unescapedValues = new LinkedHashMap<>();
@@ -19,19 +19,19 @@ public class RowInsertBuilder implements RowInsertBuilderSteps.AdditionalValues 
      * @param jdbcImpl Implementation to use on terminal builder operation
      * @param tableName name of the table to insert into
      */
-    public RowInsertBuilder(MadimadicaJdbc jdbcImpl, String tableName) {
+    public RowInsertBuilderWithImplicitId(JdbcRowInsertWithImplicitId jdbcImpl, String tableName) {
         this.jdbcImpl = jdbcImpl;
         this.tableName = tableName;
     }
 
     @Override
-    public RowInsertBuilderSteps.AdditionalValues value(String column, Object escapedValue) {
+    public RowInsertBuilderStepsWithImplicitId.AdditionalValues value(String column, Object escapedValue) {
         this.escapedValues.put(column, escapedValue);
         return this;
     }
 
     @Override
-    public RowInsertBuilderSteps.AdditionalValues valueUnescaped(String column, Object unescapedValue) {
+    public RowInsertBuilderStepsWithImplicitId.AdditionalValues valueUnescaped(String column, Object unescapedValue) {
         this.unescapedValues.put(column, unescapedValue);
         return this;
     }

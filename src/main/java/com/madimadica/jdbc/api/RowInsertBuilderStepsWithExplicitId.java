@@ -1,14 +1,17 @@
 package com.madimadica.jdbc.api;
 
+import org.springframework.jdbc.core.RowMapper;
+
 /**
- * Namespace container for the fluent builder steps used by {@link RowInsertBuilder} to construct a {@link RowInsert}.
+ * Namespace container for the fluent builder steps used by {@link RowInsertBuilderWithExplicitId} to construct a {@link RowInsert}.
+ * Similar to {@link RowInsertBuilderStepsWithImplicitId} but requires a column name for generated values.
  */
-public class RowInsertBuilderSteps {
+public class RowInsertBuilderStepsWithExplicitId {
 
     /**
      * Prevent user construction
      */
-    private RowInsertBuilderSteps() {}
+    private RowInsertBuilderStepsWithExplicitId() {}
 
     /**
      * A required step in the fluent builder API
@@ -50,24 +53,34 @@ public class RowInsertBuilderSteps {
 
         /**
          * Execute an INSERT query for the configured row insert and returns an auto-generated int.
+         * @param columnName name of the generated number's column
          * @return the auto-generated int value.
          */
-        Number insertReturningNumber();
+        Number insertReturningNumber(String columnName);
+
+        /**
+         * Execute an INSERT query for the configured row insert and maps the row with the given rowMapper.
+         * @param rowMapper how to map the inserted row
+         * @return the inserted row.
+         */
+        <T> T insertReturning(RowMapper<T> rowMapper);
 
         /**
          * Execute an INSERT query for the configured row insert and returns an auto-generated int.
+         * @param columnName name of the generated int's column
          * @return the auto-generated int value.
          */
-        default int insertReturningInt() {
-            return insertReturningNumber().intValue();
+        default int insertReturningInt(String columnName) {
+            return insertReturningNumber(columnName).intValue();
         }
 
         /**
          * Execute an INSERT query for the configured row insert and returns an auto-generated long.
+         * @param columnName name of the generated long's column
          * @return the auto-generated long value.
          */
-        default long insertReturningLong() {
-            return insertReturningNumber().longValue();
+        default long insertReturningLong(String columnName) {
+            return insertReturningNumber(columnName).longValue();
         }
     }
 }

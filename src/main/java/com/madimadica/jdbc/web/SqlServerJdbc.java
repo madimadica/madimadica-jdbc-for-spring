@@ -15,7 +15,7 @@ import java.util.StringJoiner;
  * Wrapper for Spring JDBC with SQL Server dialect.
  */
 @Component
-public class SqlServerJdbc implements JdbcWithExplicitBatchInsertID {
+public class SqlServerJdbc implements JdbcWithExplicitBatchInsertID, JdbcRowInsertWithImplicitId {
     private static final Logger LOGGER = LoggerFactory.getLogger(SqlServerJdbc.class);
     private final JdbcTemplate jdbc;
     private final NamedParameterJdbcTemplate namedJdbc;
