@@ -27,7 +27,7 @@ public class SqlServerJdbc implements JdbcWithExplicitBatchInsertID {
     /**
      * Insert Limit for SQL Server driver
      */
-    public static final int MAX_INSERTS_PER_QUERY = 1000;
+    public static final int MAX_INSERTS_PER_QUERY = 999;
 
     /**
      * Construct this as a bean
