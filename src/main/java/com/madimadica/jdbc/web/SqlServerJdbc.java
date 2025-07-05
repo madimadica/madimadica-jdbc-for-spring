@@ -1,11 +1,13 @@
 package com.madimadica.jdbc.web;
 
+import com.madimadica.jdbc.api.BatchInsert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -98,6 +100,103 @@ public class SqlServerJdbc implements JdbcWithExplicitBatchInsertID {
     @Override
     public int getMaxInsertsPerQuery() {
         return MAX_INSERTS_PER_QUERY;
+    }
+
+    @Override
+    public <T> List<Number> insertReturningNumbers(BatchInsert<T> batchInsert, String generatedColumn) {
+        final List<T> rows = batchInsert.rows();
+        if (rows.isEmpty()) {
+            getLogger().debug("No rows in batch insert");
+            return List.of();
+        }
+        StringJoiner sjColumnNames = new StringJoiner(", ", " (", ") ");
+        for (String col : batchInsert.escapedMappings().keySet()) {
+            sjColumnNames.add(col);
+        }
+        for (String col : batchInsert.escapedConstants().keySet()) {
+            sjColumnNames.add(col);
+        }
+        for (String col : batchInsert.unescapedConstants().keySet()) {
+            sjColumnNames.add(col);
+        }
+
+        // INSERT INTO [my_table] (a, ..., z) OUTPUT INSERTED.[my_id] VALUES
+        final String sqlPrefix = "INSERT INTO " +
+                wrapIdentifier(batchInsert.tableName()) +
+                sjColumnNames +
+                "OUTPUT INSERTED." +
+                wrapIdentifier(generatedColumn) +
+                " VALUES ";
+
+        final var rowMappers = batchInsert.escapedMappings().values();
+        final var escapedConstants = batchInsert.escapedConstants().values();
+        final int paramsPerRow = rowMappers.size() + escapedConstants.size();
+
+        StringJoiner valuesTemplateJoiner = new StringJoiner(",", "(", ")");
+        for (int i = 0; i < paramsPerRow; ++i) {
+            valuesTemplateJoiner.add("?");
+        }
+        for (Object constant : batchInsert.unescapedConstants().values()) {
+            valuesTemplateJoiner.add(String.valueOf(constant));
+        }
+        // "(?,?,?,GETDATE())"
+        final String valuesTemplate = valuesTemplateJoiner.toString();
+        // ",(?,?,?,GETDATE())"
+        final String valuesTemplateWithComma = "," + valuesTemplate;
+
+
+        int batchSize = rows.size();
+        if (paramsPerRow * batchSize > getMaxParametersPerQuery()) {
+            batchSize = getMaxParametersPerQuery() / paramsPerRow;
+        }
+        if (batchSize > getMaxInsertsPerQuery()) {
+            batchSize = getMaxInsertsPerQuery();
+        }
+
+        final List<List<T>> batches = InternalUtils.partitionBySize(rows, batchSize);
+        final List<Number> generatedValues = new ArrayList<>(rows.size());
+
+
+        getLogger().debug(
+                "Batch inserting {} rows ({} {}): {}{}",
+                rows.size(),
+                batches.size(),
+                batches.size() == 1 ? "batch" : "batches",
+                sqlPrefix,
+                valuesTemplate
+        );
+
+        for (List<T> batch : batches) {
+            final int rowCount = batch.size();
+            final int parameterCount = rowCount * paramsPerRow;
+            final Object[] params = new Object[parameterCount];
+            int paramIndex = 0;
+            for (int i = 0; i < rowCount; i++) {
+                T row = batch.get(i);
+                for (var mapper : rowMappers) {
+                    params[paramIndex++] = mapper.apply(row);
+                }
+                for (var constant : escapedConstants) {
+                    params[paramIndex++] = constant;
+                }
+            }
+            if (parameterCount != paramIndex) {
+                throw new AssertionError("Expected %d parameters, only added %d".formatted(parameterCount, paramIndex));
+            }
+            StringBuilder currentBatchSql = new StringBuilder(sqlPrefix);
+            currentBatchSql.append(valuesTemplate);
+            if (rowCount > 1) {
+                currentBatchSql.repeat(valuesTemplateWithComma, rowCount - 1);
+            }
+            List<Number> batchIds = getJdbcTemplate().queryForList(
+                    currentBatchSql.toString(),
+                    Number.class,
+                    params
+            );
+            generatedValues.addAll(batchIds);
+        }
+
+        return generatedValues;
     }
 
 }
